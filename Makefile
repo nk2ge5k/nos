@@ -12,7 +12,17 @@ bootloader: $(_BUILD_DIR) ## Builds bootloader
 kernel: $(_BUILD_DIR) ## Builds kernel
 	i686-elf-gcc -c $(SOURCE_DIR)/kernel.c -o $(BUILD_DIR)/kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
-build: bootloader kernel ## Build all targets
+link: bootloader kernel ## Link OS binary
+	i686-elf-gcc -T linker.ld -o $(BUILD_DIR)/nos.bin -ffreestanding -O2 -nostdlib $(BUILD_DIR)/boot.o $(BUILD_DIR)/kernel.o -lgcc
+
+ISO_DIR = $(BUILD_DIR)/iso
+iso: link ## Make ISO image
+	mkdir -p $(ISO_DIR)/boot/grub
+	cp $(BUILD_DIR)/nos.bin $(ISO_DIR)/boot
+	cp $(ROOT_DIR)/grub.cfg $(ISO_DIR)/boot/grub
+	grub-mkrescue -o $(BUILD_DIR)/nos.iso $(ISO_DIR)
+
+build: iso ## Build all targets
 
 help: ## Show this help
 	@echo "\nSpecify a command. The choices are:\n"
@@ -22,4 +32,3 @@ help: ## Show this help
 .PHONY: help
 
 .DEFAULT_GOAL := help
-
