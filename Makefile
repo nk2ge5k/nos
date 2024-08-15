@@ -19,7 +19,7 @@ build: bootloader kernel ## Link OS binary
 	i686-elf-gcc -T linker.ld -o $(BUILD_DIR)/nos.bin \
 		-ffreestanding -O2 -nostdlib $(BUILD_DIR)/boot.o $(BUILD_DIR)/kernel.o -lgcc
 
-run: 
+run: build
 	qemu-system-i386 -kernel $(BUILD_DIR)/nos.bin
 
 ISO_DIR = $(BUILD_DIR)/iso
